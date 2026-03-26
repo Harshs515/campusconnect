@@ -1536,3 +1536,4 @@ httpServer.listen(PORT, () => {
   console.log(`🔌 Socket.io ready for video calls`);
   console.log(`🗄️  Database: ${process.env.VITE_DB_NAME}@${process.env.VITE_DB_HOST}\n`);
 });
+
