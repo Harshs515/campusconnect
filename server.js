@@ -255,7 +255,7 @@ const signupOtpStore = new Map();
 app.post('/api/upload/avatar', authenticate, uploadAvatar.single('avatar'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    const avatarUrl = `http://localhost:${process.env.PORT || 5000}/uploads/avatars/${req.file.filename}`;
+    const avatarUrl = `${process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`}/uploads/avatars/${req.file.filename}`;
     await pool.query('UPDATE profiles SET avatar=$1, updated_at=now() WHERE id=$2', [avatarUrl, req.user.id]);
     res.json({ success: true, url: avatarUrl, filename: req.file.filename });
   } catch (err) {
@@ -266,7 +266,7 @@ app.post('/api/upload/avatar', authenticate, uploadAvatar.single('avatar'), asyn
 app.post('/api/upload/resume', authenticate, uploadResume.single('resume'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    const resumeUrl = `http://localhost:${process.env.PORT || 5000}/uploads/resumes/${req.file.filename}`;
+    const resumeUrl = `${process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`}/uploads/resumes/${req.file.filename}`;
     await pool.query(
       `INSERT INTO student_profiles (id, resume_url, updated_at) VALUES ($1,$2,now())
        ON CONFLICT (id) DO UPDATE SET resume_url=$2, updated_at=now()`,
