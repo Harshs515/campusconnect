@@ -46,7 +46,11 @@ pool.on('connect', () => console.log('✅ PostgreSQL connected'));
 pool.on('error', (err) => console.error('❌ Pool error:', err.message));
 
 // ── Middleware ──────────────────────────────────────────────────
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express.json({ limit: '10mb' }));
 
 // ── Uploads folder setup ───────────────────────────────────────
@@ -241,9 +245,7 @@ const buildSignupVerifyEmail = (otp, userName) => `
 `;
 
 // ── In-memory OTP stores ───────────────────────────────────────
-// Password reset OTPs: { otp, expiresAt, verified, userName }
 const otpStore = new Map();
-// Signup verification OTPs: { otp, expiresAt, name, password_hash, role }
 const signupOtpStore = new Map();
 
 // ══════════════════════════════════════════════════════════════
@@ -319,8 +321,6 @@ app.get('/health', async (req, res) => {
 // AUTH ROUTES
 // ══════════════════════════════════════════════════════════════
 
-// POST /api/auth/signup
-// Does NOT create DB record yet — sends OTP email first.
 app.post('/api/auth/signup', async (req, res) => {
   const { email, password, name, role } = req.body;
   if (!email || !password || !name || !role)
@@ -361,8 +361,6 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 });
 
-// POST /api/auth/verify-signup
-// Verifies OTP and creates the actual DB account.
 app.post('/api/auth/verify-signup', async (req, res) => {
   const { email, otp } = req.body;
   if (!email || !otp)
@@ -383,7 +381,6 @@ app.post('/api/auth/verify-signup', async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    // Remove any unverified partial record from a previous attempt
     await client.query('DELETE FROM profiles WHERE email = $1 AND email_verified = false', [normalizedEmail]);
 
     const { rows } = await client.query(
@@ -414,7 +411,6 @@ app.post('/api/auth/verify-signup', async (req, res) => {
   }
 });
 
-// POST /api/auth/login
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password)
@@ -439,10 +435,8 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// POST /api/auth/logout
 app.post('/api/auth/logout', (req, res) => res.json({ success: true }));
 
-// POST /api/auth/forgot-password
 app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email is required' });
@@ -451,7 +445,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 
   try {
     const { rows } = await pool.query('SELECT id, name FROM profiles WHERE email = $1', [normalizedEmail]);
-    if (!rows.length) return res.json({ success: true }); // silent — don't reveal existence
+    if (!rows.length) return res.json({ success: true });
 
     const userName = rows[0].name;
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -475,7 +469,6 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   }
 });
 
-// POST /api/auth/verify-otp
 app.post('/api/auth/verify-otp', (req, res) => {
   const { email, otp } = req.body;
   if (!email || !otp) return res.status(400).json({ error: 'Email and OTP are required' });
@@ -496,7 +489,6 @@ app.post('/api/auth/verify-otp', (req, res) => {
   res.json({ success: true });
 });
 
-// POST /api/auth/reset-password
 app.post('/api/auth/reset-password', async (req, res) => {
   const { email, otp, newPassword } = req.body;
   if (!email || !otp || !newPassword)
@@ -528,7 +520,6 @@ app.post('/api/auth/reset-password', async (req, res) => {
   }
 });
 
-// GET /api/auth/me
 app.get('/api/auth/me', authenticate, async (req, res) => {
   try {
     const { rows } = await pool.query(
@@ -547,7 +538,6 @@ app.get('/api/auth/me', authenticate, async (req, res) => {
   }
 });
 
-// PUT /api/auth/profile
 app.put('/api/auth/profile', authenticate, async (req, res) => {
   const client = await pool.connect();
   try {
@@ -911,7 +901,7 @@ app.post('/api/messages', authenticate, async (req, res) => {
     return res.status(400).json({ error: 'receiver_id and content required' });
   if (receiver_id === req.user.id)
     return res.status(400).json({ error: 'Cannot message yourself' });
- 
+
   try {
     const { rows } = await pool.query(
       `INSERT INTO messages (sender_id, receiver_id, content, type, voice_duration)
@@ -924,7 +914,6 @@ app.post('/api/messages', authenticate, async (req, res) => {
   }
 });
 
-// PATCH /api/messages/:id — edit a message (sender only)
 app.patch('/api/messages/:id', authenticate, async (req, res) => {
   const { content } = req.body;
   if (!content || !content.trim())
@@ -946,7 +935,6 @@ app.patch('/api/messages/:id', authenticate, async (req, res) => {
   }
 });
 
-// DELETE /api/messages/:id — delete a message (sender only)
 app.delete('/api/messages/:id', authenticate, async (req, res) => {
   try {
     const { rows: check } = await pool.query('SELECT sender_id FROM messages WHERE id = $1', [req.params.id]);
@@ -1089,7 +1077,6 @@ app.post('/api/posts', authenticate, async (req, res) => {
   }
 });
 
-// DELETE /api/posts/:id — Admin can delete any, author can delete own
 app.delete('/api/posts/:id', authenticate, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT author_id FROM posts WHERE id = $1', [req.params.id]);
@@ -1432,77 +1419,105 @@ app.get('/api/analytics/overview', authenticate, async (req, res) => {
   }
 });
 
-// ── Start Server ───────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// SOCKET.IO + HTTP SERVER
+// ══════════════════════════════════════════════════════════════
+
 import { createServer } from 'http';
 import { Server } from 'socket.io';
- 
+
 const httpServer = createServer(app);
- 
+
 const io = new Server(httpServer, {
-  cors: { origin: '*', methods: ['GET', 'POST'] },
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
 });
- 
-// Map userId → socketId so we can route calls to the right person
-const onlineUsers = new Map(); // userId → socketId
- 
+
+// Map userId → socketId
+const onlineUsers = new Map();
+
 io.on('connection', (socket) => {
   console.log('🔌 Socket connected:', socket.id);
- 
-  // User registers their ID when they connect
+
+  // User registers their userId on connect
   socket.on('join', (userId) => {
     onlineUsers.set(userId, socket.id);
     console.log(`👤 User ${userId} joined (socket ${socket.id})`);
+    // Broadcast online status to all others
+    socket.broadcast.emit('user-online', { userId });
   });
- 
-  // ── Video call signaling ──────────────────────────────────────
- 
-  // Caller initiates a call to another user
+
+  // ── Video call signaling ────────────────────────────────────
+
+  // Step 1: Caller notifies callee of incoming call
   socket.on('initiate-call', ({ to, fromName }) => {
     const targetSocket = onlineUsers.get(to);
+    const fromUserId = getUserIdBySocket(socket.id, onlineUsers);
+    console.log(`📞 Call initiated from ${fromUserId} to ${to}`);
     if (targetSocket) {
       io.to(targetSocket).emit('incoming-call', {
-        from: getUserIdBySocket(socket.id, onlineUsers),
+        from: fromUserId,
         fromName,
       });
+    } else {
+      // Target is offline — notify caller
+      socket.emit('call-failed', { reason: 'User is offline' });
     }
   });
- 
-  // WebRTC offer (from caller)
+
+  // Step 2: Caller sends WebRTC offer
   socket.on('call-offer', ({ to, offer }) => {
     const targetSocket = onlineUsers.get(to);
-    if (targetSocket) io.to(targetSocket).emit('call-offer', { offer });
+    if (targetSocket) {
+      io.to(targetSocket).emit('call-offer', { offer });
+    }
   });
- 
-  // WebRTC answer (from callee)
+
+  // Step 3: Callee sends WebRTC answer
   socket.on('call-answer', ({ to, answer }) => {
     const targetSocket = onlineUsers.get(to);
-    if (targetSocket) io.to(targetSocket).emit('call-answer', { answer });
+    if (targetSocket) {
+      io.to(targetSocket).emit('call-answer', { answer });
+    }
   });
- 
-  // ICE candidates (both sides)
+
+  // Step 4: ICE candidates (both sides)
   socket.on('ice-candidate', ({ to, candidate }) => {
     const targetSocket = onlineUsers.get(to);
-    if (targetSocket) io.to(targetSocket).emit('ice-candidate', { candidate });
+    if (targetSocket) {
+      io.to(targetSocket).emit('ice-candidate', { candidate });
+    }
   });
- 
-  // Either side ends the call
+
+  // Step 5: Either side ends the call
   socket.on('end-call', ({ to }) => {
     const targetSocket = onlineUsers.get(to);
-    if (targetSocket) io.to(targetSocket).emit('call-ended');
+    if (targetSocket) {
+      io.to(targetSocket).emit('call-ended');
+    }
   });
- 
+
+  // Handle call rejection
+  socket.on('reject-call', ({ to }) => {
+    const targetSocket = onlineUsers.get(to);
+    if (targetSocket) {
+      io.to(targetSocket).emit('call-rejected');
+    }
+  });
+
   // Clean up on disconnect
   socket.on('disconnect', () => {
-    for (const [userId, socketId] of onlineUsers.entries()) {
-      if (socketId === socket.id) {
-        onlineUsers.delete(userId);
-        console.log(`👤 User ${userId} disconnected`);
-        break;
-      }
+    const userId = getUserIdBySocket(socket.id, onlineUsers);
+    if (userId) {
+      onlineUsers.delete(userId);
+      socket.broadcast.emit('user-offline', { userId });
+      console.log(`👤 User ${userId} disconnected`);
     }
   });
 });
- 
+
 // Helper: get userId by socketId
 function getUserIdBySocket(socketId, map) {
   for (const [userId, sid] of map.entries()) {
@@ -1510,8 +1525,8 @@ function getUserIdBySocket(socketId, map) {
   }
   return null;
 }
- 
-// Start the HTTP server (replaces app.listen)
+
+// ── Start Server ───────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
   console.log('\n╔══════════════════════════════════╗');
