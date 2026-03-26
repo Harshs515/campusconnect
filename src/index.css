@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #e8ecf1;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --border: #e2e8f0;
+  --border-hover: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --green: #22c55e;
+  --green-light: #4ade80;
+  --green-dim: rgba(34,197,94,0.15);
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.card:hover { border-color: var(--border-hover); }
+
+/* Input base */
+.input-base {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  transition: all 0.2s;
+  width: 100%;
+  font-family: inherit;
+}
+.input-base:focus {
+  outline: none;
+  border-color: var(--green);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+}
+.input-base::placeholder { color: var(--text-muted); }
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(34,197,94,0.25);
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(34,197,94,0.35); }
+.btn-primary:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
+
+.btn-secondary {
+  background: #ffffff;
+  color: var(--text-primary);
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+/* Badge */
+.badge-green { background: rgba(34,197,94,0.15); color: #4ade80; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 500; }
+.badge-blue { background: rgba(59,130,246,0.15); color: #60a5fa; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 500; }
+.badge-purple { background: rgba(168,85,247,0.15); color: #c084fc; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 500; }
+.badge-amber { background: rgba(245,158,11,0.15); color: #fbbf24; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 500; }
+.badge-red { background: rgba(239,68,68,0.15); color: #f87171; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 500; }
+
+/* Animations */
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.animate-fade-up { animation: fadeUp 0.4s ease forwards; }
+.animate-fade-in { animation: fadeIn 0.3s ease forwards; }
+
+/* Remove default focus outlines */
+button:focus-visible { outline: 2px solid rgba(34,197,94,0.5); outline-offset: 2px; }
+
+/* Table styles */
+table { border-collapse: collapse; width: 100%; }
+th { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+tr:hover td { background: var(--bg-card-hover); }
