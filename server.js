@@ -1525,7 +1525,15 @@ function getUserIdBySocket(socketId, map) {
   }
   return null;
 }
-
+const distPath = path.join(__dirname, 'dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => res.send('CampusConnect API is running ✅'));
+}
 // ── Start Server ───────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
@@ -1536,4 +1544,5 @@ httpServer.listen(PORT, () => {
   console.log(`🔌 Socket.io ready for video calls`);
   console.log(`🗄️  Database: ${process.env.VITE_DB_NAME}@${process.env.VITE_DB_HOST}\n`);
 });
+
 
