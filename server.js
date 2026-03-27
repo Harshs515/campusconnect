@@ -1,9 +1,9 @@
-// ============================================================
+﻿// ============================================================
 //  CampusConnect - Express API Server
 //  Full PostgreSQL integration for all features
 //  Run: node server.js
 //
-//  ⚠️  DB MIGRATIONS — run these once before starting:
+//  âš ï¸  DB MIGRATIONS â€” run these once before starting:
 //
 //    ALTER TABLE messages ADD COLUMN IF NOT EXISTS edited BOOLEAN DEFAULT FALSE;
 //    ALTER TABLE messages ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
@@ -30,7 +30,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const { Pool } = pg;
 
-// ── Database Pool ──────────────────────────────────────────────
+// â”€â”€ Database Pool â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const pool = new Pool({
   host: process.env.VITE_DB_HOST || 'localhost',
   port: parseInt(process.env.VITE_DB_PORT || '5432'),
@@ -42,10 +42,10 @@ const pool = new Pool({
   idleTimeoutMillis: 30000,
 });
 
-pool.on('connect', () => console.log('✅ PostgreSQL connected'));
-pool.on('error', (err) => console.error('❌ Pool error:', err.message));
+pool.on('connect', () => console.log('âœ… PostgreSQL connected'));
+pool.on('error', (err) => console.error('âŒ Pool error:', err.message));
 
-// ── Middleware ──────────────────────────────────────────────────
+// â”€â”€ Middleware â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -53,7 +53,7 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 
-// ── Uploads folder setup ───────────────────────────────────────
+// â”€â”€ Uploads folder setup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const uploadsDir = path.join(__dirname, 'uploads');
 const avatarsDir = path.join(uploadsDir, 'avatars');
 const resumesDir = path.join(uploadsDir, 'resumes');
@@ -62,7 +62,7 @@ const resumesDir = path.join(uploadsDir, 'resumes');
 });
 app.use('/uploads', express.static(uploadsDir));
 
-// ── Multer config ──────────────────────────────────────────────
+// â”€â”€ Multer config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, avatarsDir),
   filename: (req, file, cb) => {
@@ -102,7 +102,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── Helpers ────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const hashPassword = (password) =>
   crypto.createHash('sha256').update(password).digest('hex');
 
@@ -146,7 +146,7 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-// ── Nodemailer transporter ─────────────────────────────────────
+// â”€â”€ Nodemailer transporter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -155,7 +155,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ── Email: Password Reset OTP ──────────────────────────────────
+// â”€â”€ Email: Password Reset OTP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const buildOtpEmail = (otp, userName) => `
 <!DOCTYPE html>
 <html>
@@ -166,7 +166,7 @@ const buildOtpEmail = (otp, userName) => `
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
         <tr>
           <td style="background:#166534;padding:32px 40px;text-align:center;">
-            <span style="color:white;font-size:20px;font-weight:800;letter-spacing:-0.5px;">🎓 CampusConnect</span>
+            <span style="color:white;font-size:20px;font-weight:800;letter-spacing:-0.5px;">ðŸŽ“ CampusConnect</span>
           </td>
         </tr>
         <tr>
@@ -174,7 +174,7 @@ const buildOtpEmail = (otp, userName) => `
             <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#111827;letter-spacing:-0.5px;">Password Reset Request</p>
             <p style="margin:0 0 28px;font-size:15px;color:#6b7280;line-height:1.6;">
               Hi ${userName ? userName + ',' : 'there,'}<br>
-              We received a request to reset your CampusConnect password. Use the code below — it expires in <strong>10 minutes</strong>.
+              We received a request to reset your CampusConnect password. Use the code below â€” it expires in <strong>10 minutes</strong>.
             </p>
             <div style="background:#f0fdf4;border:2px dashed #166534;border-radius:16px;padding:28px;text-align:center;margin-bottom:28px;">
               <p style="margin:0 0 8px;font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:2px;">Your Verification Code</p>
@@ -184,13 +184,13 @@ const buildOtpEmail = (otp, userName) => `
               If you didn't request a password reset, you can safely ignore this email.
             </p>
             <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px;">
-              <p style="margin:0;font-size:13px;color:#92400e;">⚠️ <strong>Never share this code</strong> with anyone.</p>
+              <p style="margin:0;font-size:13px;color:#92400e;">âš ï¸ <strong>Never share this code</strong> with anyone.</p>
             </div>
           </td>
         </tr>
         <tr>
           <td style="background:#f9fafb;border-top:1px solid #f3f4f6;padding:24px 40px;text-align:center;">
-            <p style="margin:0;font-size:12px;color:#9ca3af;">© 2025 CampusConnect. All rights reserved.</p>
+            <p style="margin:0;font-size:12px;color:#9ca3af;">Â© 2025 CampusConnect. All rights reserved.</p>
           </td>
         </tr>
       </table>
@@ -200,7 +200,7 @@ const buildOtpEmail = (otp, userName) => `
 </html>
 `;
 
-// ── Email: Signup Verification OTP ────────────────────────────
+// â”€â”€ Email: Signup Verification OTP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const buildSignupVerifyEmail = (otp, userName) => `
 <!DOCTYPE html>
 <html>
@@ -211,12 +211,12 @@ const buildSignupVerifyEmail = (otp, userName) => `
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
         <tr>
           <td style="background:#166534;padding:32px 40px;text-align:center;">
-            <span style="color:white;font-size:20px;font-weight:800;letter-spacing:-0.5px;">🎓 CampusConnect</span>
+            <span style="color:white;font-size:20px;font-weight:800;letter-spacing:-0.5px;">ðŸŽ“ CampusConnect</span>
           </td>
         </tr>
         <tr>
           <td style="padding:40px 40px 24px;">
-            <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#111827;">Welcome, ${userName}! 🎉</p>
+            <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#111827;">Welcome, ${userName}! ðŸŽ‰</p>
             <p style="margin:0 0 28px;font-size:15px;color:#6b7280;line-height:1.6;">
               You're almost there! Use the code below to verify your email and activate your CampusConnect account. It expires in <strong>10 minutes</strong>.
             </p>
@@ -228,13 +228,13 @@ const buildSignupVerifyEmail = (otp, userName) => `
               If you didn't create this account, simply ignore this email.
             </p>
             <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px;">
-              <p style="margin:0;font-size:13px;color:#92400e;">⚠️ <strong>Never share this code</strong> with anyone.</p>
+              <p style="margin:0;font-size:13px;color:#92400e;">âš ï¸ <strong>Never share this code</strong> with anyone.</p>
             </div>
           </td>
         </tr>
         <tr>
           <td style="background:#f9fafb;border-top:1px solid #f3f4f6;padding:24px 40px;text-align:center;">
-            <p style="margin:0;font-size:12px;color:#9ca3af;">© 2025 CampusConnect. All rights reserved.</p>
+            <p style="margin:0;font-size:12px;color:#9ca3af;">Â© 2025 CampusConnect. All rights reserved.</p>
           </td>
         </tr>
       </table>
@@ -244,13 +244,13 @@ const buildSignupVerifyEmail = (otp, userName) => `
 </html>
 `;
 
-// ── In-memory OTP stores ───────────────────────────────────────
+// â”€â”€ In-memory OTP stores â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const otpStore = new Map();
 const signupOtpStore = new Map();
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // FILE UPLOAD ROUTES
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 app.post('/api/upload/avatar', authenticate, uploadAvatar.single('avatar'), async (req, res) => {
   try {
@@ -307,7 +307,7 @@ app.delete('/api/upload/avatar', authenticate, async (req, res) => {
   }
 });
 
-// ── Health Check ───────────────────────────────────────────────
+// â”€â”€ Health Check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.get('/health', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT NOW() AS time, version() AS version');
@@ -317,9 +317,9 @@ app.get('/health', async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // AUTH ROUTES
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 app.post('/api/auth/signup', async (req, res) => {
   const { email, password, name, role } = req.body;
@@ -348,12 +348,12 @@ app.post('/api/auth/signup', async (req, res) => {
     await transporter.sendMail({
       from: `"CampusConnect" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: `${otp} — Verify your CampusConnect account`,
+      subject: `${otp} â€” Verify your CampusConnect account`,
       html: buildSignupVerifyEmail(otp, name),
       text: `Hi ${name},\n\nYour CampusConnect verification code is: ${otp}\n\nExpires in 10 minutes.`,
     });
 
-    console.log(`📧 Signup OTP sent to ${email}`);
+    console.log(`ðŸ“§ Signup OTP sent to ${email}`);
     res.status(200).json({ success: true });
   } catch (err) {
     console.error('Signup error:', err);
@@ -461,7 +461,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       text: `Your CampusConnect password reset code is: ${otp}\n\nExpires in 10 minutes.`,
     });
 
-    console.log(`📧 Password reset OTP sent to ${email}`);
+    console.log(`ðŸ“§ Password reset OTP sent to ${email}`);
     res.json({ success: true });
   } catch (err) {
     console.error('forgot-password error:', err);
@@ -581,9 +581,9 @@ app.put('/api/auth/profile', authenticate, async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // JOBS ROUTES
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 app.get('/api/jobs', authenticate, async (req, res) => {
   const { status, type, search } = req.query;
@@ -684,9 +684,9 @@ app.delete('/api/jobs/:id', authenticate, async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // APPLICATIONS ROUTES
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 app.get('/api/applications', authenticate, async (req, res) => {
   try {
@@ -784,9 +784,9 @@ app.patch('/api/applications/:id/status', authenticate, async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // EVENTS ROUTES
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 app.get('/api/events', authenticate, async (req, res) => {
   try {
@@ -841,9 +841,9 @@ app.post('/api/events/:id/rsvp', authenticate, async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MESSAGES ROUTES
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 app.get('/api/messages/chats', authenticate, async (req, res) => {
   try {
@@ -949,9 +949,9 @@ app.delete('/api/messages/:id', authenticate, async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ALUMNI ROUTES
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 app.get('/api/alumni', authenticate, async (req, res) => {
   try {
@@ -1039,9 +1039,9 @@ app.delete('/api/alumni/:id', authenticate, async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SOCIAL / POSTS ROUTES
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 app.get('/api/posts', authenticate, async (req, res) => {
   try {
@@ -1165,9 +1165,9 @@ app.get('/api/posts/user/:userId', authenticate, async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // CONNECTIONS ROUTES
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 app.get('/api/connections', authenticate, async (req, res) => {
   try {
@@ -1260,9 +1260,9 @@ app.get('/api/connections/sent', authenticate, async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // USERS / PROFILES
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 app.get('/api/users', authenticate, async (req, res) => {
   try {
@@ -1392,9 +1392,9 @@ app.delete('/api/users/:id/block', authenticate, async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ANALYTICS (admin)
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 app.get('/api/analytics/overview', authenticate, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
@@ -1419,9 +1419,9 @@ app.get('/api/analytics/overview', authenticate, async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SOCKET.IO + HTTP SERVER
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -1435,34 +1435,34 @@ const io = new Server(httpServer, {
   },
 });
 
-// Map userId → socketId
+// Map userId â†’ socketId
 const onlineUsers = new Map();
 
 io.on('connection', (socket) => {
-  console.log('🔌 Socket connected:', socket.id);
+  console.log('ðŸ”Œ Socket connected:', socket.id);
 
   // User registers their userId on connect
   socket.on('join', (userId) => {
     onlineUsers.set(userId, socket.id);
-    console.log(`👤 User ${userId} joined (socket ${socket.id})`);
+    console.log(`ðŸ‘¤ User ${userId} joined (socket ${socket.id})`);
     // Broadcast online status to all others
     socket.broadcast.emit('user-online', { userId });
   });
 
-  // ── Video call signaling ────────────────────────────────────
+  // â”€â”€ Video call signaling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   // Step 1: Caller notifies callee of incoming call
   socket.on('initiate-call', ({ to, fromName }) => {
     const targetSocket = onlineUsers.get(to);
     const fromUserId = getUserIdBySocket(socket.id, onlineUsers);
-    console.log(`📞 Call initiated from ${fromUserId} to ${to}`);
+    console.log(`ðŸ“ž Call initiated from ${fromUserId} to ${to}`);
     if (targetSocket) {
       io.to(targetSocket).emit('incoming-call', {
         from: fromUserId,
         fromName,
       });
     } else {
-      // Target is offline — notify caller
+      // Target is offline â€” notify caller
       socket.emit('call-failed', { reason: 'User is offline' });
     }
   });
@@ -1513,7 +1513,7 @@ io.on('connection', (socket) => {
     if (userId) {
       onlineUsers.delete(userId);
       socket.broadcast.emit('user-offline', { userId });
-      console.log(`👤 User ${userId} disconnected`);
+      console.log(`ðŸ‘¤ User ${userId} disconnected`);
     }
   });
 });
@@ -1532,18 +1532,19 @@ if (fs.existsSync(distPath)) {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 } else {
-  app.get('/', (req, res) => res.send('CampusConnect API is running ✅'));
+  app.get('/', (req, res) => res.send('CampusConnect API is running OK'));
 }
-// ── Start Server ───────────────────────────────────────────────
+// â”€â”€ Start Server â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
-  console.log('\n╔══════════════════════════════════╗');
-  console.log('║   CampusConnect API Server       ║');
-  console.log('╚══════════════════════════════════╝\n');
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-  console.log(`🔌 Socket.io ready for video calls`);
-  console.log(`🗄️  Database: ${process.env.VITE_DB_NAME}@${process.env.VITE_DB_HOST}\n`);
+  console.log('\nâ•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—');
+  console.log('â•‘   CampusConnect API Server       â•‘');
+  console.log('â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•\n');
+  console.log(`ðŸš€ Server running at http://localhost:${PORT}`);
+  console.log(`ðŸ”Œ Socket.io ready for video calls`);
+  console.log(`ðŸ—„ï¸  Database: ${process.env.VITE_DB_NAME}@${process.env.VITE_DB_HOST}\n`);
 });
+
 
 
 
