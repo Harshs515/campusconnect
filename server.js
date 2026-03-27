@@ -1534,17 +1534,14 @@ if (fs.existsSync(distPath)) {
 } else {
   app.get('/', (req, res) => res.send('CampusConnect API is running OK'));
 }
-// â”€â”€ Start Server â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Start Server ───────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
-  console.log('\nâ•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—');
-  console.log('â•‘   CampusConnect API Server       â•‘');
-  console.log('â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•\n');
-  console.log(`ðŸš€ Server running at http://localhost:${PORT}`);
-  console.log(`ðŸ”Œ Socket.io ready for video calls`);
-  console.log(`ðŸ—„ï¸  Database: ${process.env.VITE_DB_NAME}@${process.env.VITE_DB_HOST}\n`);
+  console.log('CampusConnect API Server started');
+  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Socket.io ready for video calls`);
+  console.log(`Database: ${process.env.VITE_DB_NAME}@${process.env.VITE_DB_HOST}`);
 });
-
 
 
 
